@@ -1,0 +1,56 @@
+load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")
+
+label_flag(
+    name = "label_flag",
+    build_setting_default = ":a",
+)
+
+config_setting(
+    name = "flag_points_to_a",
+    flag_values = {
+        ":label_flag": ":a",
+    },
+)
+
+constraint_setting(
+    name = "constraint_setting",
+    default_constraint_value = ":b",
+)
+
+constraint_value(
+    name = "constraint_value_a",
+    constraint_setting = ":constraint_setting",
+)
+
+constraint_value(
+    name = "constraint_value_b",
+    constraint_setting = ":constraint_setting",
+)
+
+cc_library(
+    name = "library_with_select",
+    includes = select({
+        ":flag_points_to_a": [],
+        "//conditions:default": ["public"],
+    }),
+    deps = [":label_flag"],
+)
+
+cc_library(
+    name = "a",
+    target_compatible_with = [":constraint_value_a"],
+)
+
+cc_library(
+    name = "b",
+)
+
+platform(
+    name = "platform_a_is_incompatible_with",
+    constraint_values = [":constraint_value_b"] + HOST_CONSTRAINTS,
+)
+
+platform(
+    name = "platform_a_is_compatible_with",
+    constraint_values = [":constraint_value_a"] + HOST_CONSTRAINTS,
+)
