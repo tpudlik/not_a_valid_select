@@ -1,1 +1,3 @@
 module(name = "incompatible", version = "0.0.1")
+
+bazel_dep(name = "platforms", version = "0.0.10")
